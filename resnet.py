@@ -33,9 +33,9 @@ class ResNetCBF(nn.Module):
         super().__init__()
         layers = nn.ModuleList()
         layers.append(nn.Linear(input_size, hidden_size))
-        for _ in range(num_layers - 1):  # Two hidden layers
+        for _ in range(num_layers - 1):
             layers.append(ResidualBlock(hidden_size))
-        layers.append(nn.Linear(hidden_size, 1))  # Output layer
+        layers.append(nn.Linear(hidden_size, 1))
         self.model = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
