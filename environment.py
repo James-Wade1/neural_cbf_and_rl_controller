@@ -44,7 +44,7 @@ class Visualizer:
     def __init__(self, env: Environment):
         self.env: Environment = env
 
-    def render(self, traj: np.ndarray, anim: bool = False, title: str = "") -> None:
+    def render(self, traj: np.ndarray, anim: bool = False, title: str = "", save_path: str = None) -> None:
         import matplotlib.pyplot as plt
         from matplotlib.animation import FuncAnimation
         from matplotlib.patches import Circle, Polygon
@@ -160,6 +160,26 @@ class Visualizer:
             # Create animation with smooth playback
             anim_obj = FuncAnimation(fig, update, frames=len(traj), init_func=init,
                                      blit=True, interval=50, repeat=True)
+
+            # Save animation as MP4 if save_path is provided
+            if save_path:
+                print(f"Saving animation to {save_path}...")
+                try:
+                    # Try using ffmpeg writer (preferred for MP4)
+                    from matplotlib.animation import FFMpegWriter
+                    writer = FFMpegWriter(fps=20, metadata=dict(artist='Robot Simulation'), bitrate=1800)
+                    anim_obj.save(save_path, writer=writer)
+                    print(f"Animation saved successfully to {save_path}")
+                except Exception as e:
+                    print(f"Error saving with FFMpegWriter: {e}")
+                    print("Trying alternative writer...")
+                    try:
+                        # Fallback to pillow writer
+                        anim_obj.save(save_path, writer='pillow', fps=20)
+                        print(f"Animation saved successfully to {save_path}")
+                    except Exception as e2:
+                        print(f"Error saving animation: {e2}")
+                        print("Make sure ffmpeg is installed or try a different format.")
 
             plt.show()
         else:

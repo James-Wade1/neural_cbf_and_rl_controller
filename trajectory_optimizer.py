@@ -16,7 +16,7 @@ class TrajectoryOptimizer:
         num_step = 0
         traj = [self.env.robot.position.copy()]
         self.env.set_goal(goal)
-        while self.env.get_positional_error() > 0.01 and num_step < max_iters:
+        while self.env.get_positional_error() > 0.1 and num_step < max_iters:
             u_nom = self.env.get_robot_nominal_ctrl(goal)
 
             u = cp.Variable(u_nom.shape)

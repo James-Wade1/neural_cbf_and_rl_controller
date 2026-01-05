@@ -13,7 +13,7 @@ torch.manual_seed(42)
 
 radii = np.random.uniform(0.2, 0.8, 5)
 
-def run(model_path: str = "", title: str = "", goal_idx: int = 0, use_rl: bool = False) -> None:
+def run(model_path: str = "", title: str = "", goal_idx: int = 0, use_rl: bool = False, save_animation: str = None) -> None:
     obstacles = [
         Obstacle(radius=radii[0], center=np.array([1.5, 1.0]), color="red"),
         Obstacle(radius=radii[1], center=np.array([3.5, 3.0]), color="green"),
@@ -35,7 +35,7 @@ def run(model_path: str = "", title: str = "", goal_idx: int = 0, use_rl: bool =
     robot = Robot(radius=0.2, position=np.array([0.0, 0.0]))
 
     if use_rl:
-        model: ActorCritic = torch.load("final_project_data/ppo_controller_model1.pth", map_location=device, weights_only=False)
+        model: ActorCritic = torch.load("final_project_data/ppo_controller_model.pth", map_location=device, weights_only=False)
         model = model.to(device).eval()
         controller = RLController(model=model, device=device, gain=1.0)
         robot.controller = controller
@@ -48,11 +48,11 @@ def run(model_path: str = "", title: str = "", goal_idx: int = 0, use_rl: bool =
     print(trajectory)
 
     visualizer = Visualizer(env=env)
-    visualizer.render(trajectory, anim=False, title=title)
-    # visualizer.plot_min_h_values(grid_resolution=100, title=title)
-    # visualizer.plot_velocity_vector_field(goal=goal_pos, grid_resolution=20, title="PPO Controller")
+    visualizer.render(trajectory, anim=True, title=title, save_path=save_animation)
+    visualizer.plot_min_h_values(grid_resolution=100, title=title)
+    visualizer.plot_velocity_vector_field(goal=goal_pos, grid_resolution=20, title="PPO Controller")
 
 if __name__ == "__main__":
     run(model_path="final_project_data/fully_connected_cbf_model.pth", title="Fully Connected CBF Model and RL Controller", goal_idx=1, use_rl=True)
-    run(model_path="final_project_data/resnet_cbf_model.pth", title="ResNet CBF Model and RL Controller", goal_idx=1, use_rl=True)
-    run(title="Analytical CBFs and RL Controller", goal_idx=1, use_rl=True)
+    run(model_path="final_project_data/resnet_cbf_model.pth", title="ResNet CBF Model and RL Controller", goal_idx=1, use_rl=True, save_animation="resnet_cbf_rl_animation.mp4")
+    run(title="Analytical CBFs and Analytical Controller", goal_idx=1, use_rl=False, save_animation="analytical_cbf_animation.mp4")
